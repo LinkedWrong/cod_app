@@ -1,26 +1,36 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { useEffect, useState } from "react"
+import { useQRScanner, useWebApp } from "twa-sdk-react"
+import { usePopup } from "twa-sdk-react"
+import { useMainButton } from "twa-sdk-react"
 
 function App() {
+  const webApp = useWebApp()
+  const scanner = useQRScanner()
+  const popup = usePopup()
+  const mainButton = useMainButton()
+  // const [message, _] = useState("")
+
+  useEffect(() => {
+    const openScanner = async () => {
+      let res = await scanner.open()
+      if (res) {
+        await popup.open({ message: res })
+      }
+      scanner.close()
+    }
+
+    mainButton.setText("Сканировать").show()
+    mainButton.on("click", openScanner)
+    mainButton.commit()
+    webApp.ready()
+  }, [webApp, mainButton, popup, scanner])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {/* <p>{message}</p> */}
+      <p>{webApp.platform}</p>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
